@@ -55,6 +55,6 @@ class SCTest extends FlatSpec with Matchers {
 	def mkString(xs: List[Int], seps: List[String]): String = xs match {
 		case Nil => ""
 		case y :: Nil => y.toString
-		case y1 :: y2 :: ys => y1.toString ++ oneOf(seps)() ++ mkString(y2 :: ys, seps)
+		case y1 :: y2 :: ys => y1.toString ++ Gen.oneOf(seps)() ++ mkString(y2 :: ys, seps)
 	}
 }
