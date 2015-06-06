@@ -8,10 +8,10 @@ import org.scalatest.{FlatSpec, Matchers}
 
 @RunWith(classOf[JUnitRunner])
 class SCTest extends FlatSpec with Matchers {
-	val nonNegativeIntegers: () => Int = () => Gen.inIntRange(0, 1500)
+	val nonNegativeIntegers: () => Int = () => inIntRange(0, 1500)
 
 	def separators: () => Char = () => {
-		val c = Gen.inCharRange(1.toChar, 255.toChar)()
+		val c = inCharRange(1.toChar, 255.toChar)()
 		if (isValidSeparator(c)) c else separators()
 	}
 
@@ -23,23 +23,23 @@ class SCTest extends FlatSpec with Matchers {
 	"Given a non-negative integer" should "return the numbers value if it is non-negative otherwise 0" in
 		forAll(nonNegativeIntegers) { n =>
 			val result = if (n < 1001) n else 0
-			assert(add(n.toString) === result)
+			add(n.toString) should equal(result)
 		}
 
 	"Given non-negative integers separated with a comma or newline" should "return the sum of all numbers less than 1001" in
 		forAll(nonEmptyListOf(nonNegativeIntegers)) { ns =>
-			assert(add(mkString(ns, List(",", "\n"))) === ns.filter(_ < 1001).sum)
+			add(mkString(ns, List(",", "\n"))) should equal (ns.filter(_ < 1001).sum)
 		}
 
 	"Given non-negative integers separated with a single character custom separator" should "return the sum of all numbers less than 1001" in
 		forAll(nonEmptyListOf(nonNegativeIntegers), separators) { (ns, sep) =>
-			assert(add(s"//$sep\n${ns.mkString(sep.toString)}") === ns.filter(_ < 1001).sum)
+			add(s"//$sep\n${ns.mkString(sep.toString)}") should equal (ns.filter(_ < 1001).sum)
 		}
 
 	"Given non-negative integers separated with multiple multi character custom separator" should "return the sum of all numbers less than 1001" in
 		forAll(nonEmptyListOf(nonNegativeIntegers), nonEmptyListOf(nonEmptyListOf(separators))) { (ns, seps) =>
 			val ssep = seps.map(_.mkString)
-			assert(add(s"//[${ssep.mkString("][")}]\n${mkString(ns, ssep)}") === ns.filter(_ < 1001).sum)
+			add(s"//[${ssep.mkString("][")}]\n${mkString(ns, ssep)}") should equal(ns.filter(_ < 1001).sum)
 		}
 
 	"Given numbers with at least one negative separated with a comma" should "throw an exception with the negatives in the exception message" in
@@ -48,7 +48,7 @@ class SCTest extends FlatSpec with Matchers {
 				val ex = intercept[IllegalArgumentException] {
 					add(ns.mkString(","))
 				}
-				assert(ex.getMessage === ns.filter(_ < 0).mkString(","))
+				ex.getMessage should equal(ns.filter(_ < 0).mkString(","))
 			}
 		}
 
