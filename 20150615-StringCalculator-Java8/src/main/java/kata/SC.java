@@ -28,12 +28,16 @@ public class SC {
             seps.sort(Comparator.<String>reverseOrder());
             String regex = seps.stream().map(Pattern::quote).collect(Collectors.joining("|"));
 
-            return Stream.of(input.substring(indexOfNewline + 1).split(regex)).map(Integer::parseInt);
+            return parse(input.substring(indexOfNewline + 1), regex);
         } else if (input.startsWith("//")) {
-            return Stream.of(input.substring(4).split(quote(input.substring(2, 3)))).map(Integer::parseInt);
+            return parse(input.substring(4), quote(input.substring(2, 3)));
         } else {
-            return Stream.of(input.split(",|\n")).map(Integer::parseInt);
+            return parse(input, ",|\n");
         }
+    }
+
+    private static Stream<Integer> parse(String source, String separatorRegex) {
+        return Stream.of(source.split(separatorRegex)).map(Integer::parseInt);
     }
 }
 
