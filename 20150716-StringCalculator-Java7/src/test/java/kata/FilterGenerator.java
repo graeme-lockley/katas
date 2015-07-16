@@ -2,9 +2,11 @@ package kata;
 
 public class FilterGenerator<T> implements Generator<T> {
     private final Generator<T> generator;
+    private final Predicate<T> predicate;
 
-    public FilterGenerator(Generator<T> generator) {
+    public FilterGenerator(Generator<T> generator, Predicate<T> predicate) {
         this.generator = generator;
+        this.predicate = predicate;
     }
 
     @Override
@@ -12,13 +14,9 @@ public class FilterGenerator<T> implements Generator<T> {
         while (true) {
             T result = generator.next();
 
-            if (!filter(result)) {
+            if (predicate.evaluate(result)) {
                 return result;
             }
         }
-    }
-
-    protected boolean filter(T result) {
-        return false;
     }
 }
