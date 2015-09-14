@@ -1,22 +1,5 @@
 package kata;
 
-/*
-    INPUT ::= EOS
-            | INTEGER { ( ',' | '\n' ) INTEGER } EOS
-            | '/' '/' INPUT_TAIL EOS
-
-    INPUT_TAIL ::= SEPARATOR '\n' INTEGER { SEPARATOR INTEGER }
-                 | '[' SEPARATORS ']' '\n' INTEGER { SEPARATORS INTEGER }
-
-    INTEGER ::= [ '-' ] DIGIT { DIGIT }
-
-    DIGIT ::= '0' | ... | '9'
-
-    SEPARATORS ::= SEPARATOR { SEPARATOR }
-
-    SEPARATOR ::= ( 1C | ... | 255C ) \ ( '0' | ... | '9' | '[' | ']' )
- */
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +19,11 @@ public class SC {
         return new SC(new Lexer(input)).INPUT();
     }
 
+    /*
+        INPUT ::= EOS
+                | INTEGER { ( ',' | '\n' ) INTEGER } EOS
+                | '/' '/' INPUT_TAIL EOS
+    */
     private int INPUT() {
         List<Integer> negatives = new ArrayList<>();
 
@@ -69,6 +57,10 @@ public class SC {
         }
     }
 
+    /*
+        INPUT_TAIL ::= SEPARATOR '\n' INTEGER { SEPARATOR INTEGER }
+                    | '[' SEPARATORS ']' '\n' INTEGER { SEPARATORS INTEGER }
+    */
     private int INPUT_TAIL(List<Integer> negatives) {
         int result;
 
@@ -92,7 +84,7 @@ public class SC {
             separators.add(SEPARATORS());
             match(']');
 
-            while(head() == '[') {
+            while (head() == '[') {
                 skip();
                 separators.add(SEPARATORS());
                 match(']');
@@ -116,6 +108,9 @@ public class SC {
         return result;
     }
 
+    /*
+        SEPARATORS ::= SEPARATOR { SEPARATOR }
+     */
     private String SEPARATORS() {
         if (isSeparator(head())) {
             StringBuilder result = new StringBuilder();
@@ -131,6 +126,9 @@ public class SC {
         }
     }
 
+    /*
+        SEPARATOR ::= ( 1C | ... | 255C ) \ ( '0' | ... | '9' | '[' | ']' )
+     */
     private char SEPARATOR() {
         if (isSeparator(head())) {
             char result = head();
@@ -141,18 +139,9 @@ public class SC {
         }
     }
 
-    private boolean isSeparator(char c) {
-        return c != Lexer.EOS && !isDigit(c) && c != '[' && c != ']';
-    }
-
-    private void match(char c) {
-        if (head() == c) {
-            skip();
-        } else {
-            throw error("Expected " + c + " (" + ((int) c) + ")");
-        }
-    }
-
+    /*
+           INTEGER ::= [ '-' ] DIGIT { DIGIT }
+     */
     private int INTEGER(List<Integer> negatives) {
         boolean isNegative;
 
@@ -177,6 +166,9 @@ public class SC {
         return isNegative ? -result : result;
     }
 
+    /*
+        DIGIT ::= '0' | ... | '9'
+     */
     private int DIGIT() {
         if (isDigit(head())) {
             int result = ((int) head()) - ((int) '0');
@@ -187,8 +179,16 @@ public class SC {
         }
     }
 
-    private RuntimeException error(String message) {
-        return lexer.error(message);
+    private boolean isSeparator(char c) {
+        return c != Lexer.EOS && !isDigit(c) && c != '[' && c != ']';
+    }
+
+    private void match(char c) {
+        if (head() == c) {
+            skip();
+        } else {
+            throw error("Expected " + c + " (" + ((int) c) + ")");
+        }
     }
 
     private char head() {
@@ -197,5 +197,9 @@ public class SC {
 
     private void skip() {
         lexer.skip();
+    }
+
+    private RuntimeException error(String message) {
+        return lexer.error(message);
     }
 }
