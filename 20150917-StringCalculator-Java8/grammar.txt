@@ -1,0 +1,73 @@
+<INPUT> ::= <EOS>
+          | <INTEGER> { ( ',' | '\n' ) <INTEGER> } <EOS>
+	  	  | '/' '/' <INPUT_TAIL>
+
+INPUT_TAIL ::= <SEPARATOR> '\n' <INTEGER> { <SEPARATOR> <INTEGER> }
+		    | '[' <SEPARATORS> ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+
+
+<INTEGER> ::= <POSITIVE_INTEGER>
+            | <NEGATIVE_INTEGER>
+
+<NEGATIVE_INTEGER> ::= '-' <POSITIVE_INTEGER>
+
+<POSITIVE_INTEGER> ::= <DIGIT> { <DIGIT> }
+
+<DIGIT> ::= '0' | ... | '9'
+
+<SEPARATORS> ::= <SEPARATOR> { <SEPARATOR> }
+
+<SEPARATOR> ::= ( 1C | ... | 255C ) \ ( '0' | ... | '9' | '[' | ']' )
+
+<EOS> ::= 0C
+
+
+---
+
+
+"//[xxx][yyy]\n123xxx-23" EOS
+
+
+---
+
+<INPUT>
+'/' '/' '[' <SEPARATORS> ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' <SEPARATOR> { <SEPARATOR> } ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' { <SEPARATOR> } ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' <SEPARATOR> { <SEPARATOR> } ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' { <SEPARATOR> } ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' <SEPARATOR> { <SEPARATOR> } ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' { <SEPARATOR> } ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' <SEPARATORS> ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' <SEPARATOR> { <SEPARATOR> } ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' { <SEPARATOR> } ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' <SEPARATOR> { <SEPARATOR> } ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' { <SEPARATOR> } ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' { <SEPARATOR> } ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' { '[' <SEPARATORS> ']' } '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' <POSITIVE_INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' <DIGIT> { <DIGIT> } { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' { <DIGIT> } { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' <DIGIT> { <DIGIT> } { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' { <DIGIT> } { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' <DIGIT> { <DIGIT> } { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' { <DIGIT> } { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' <SEPARATORS> <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' <SEPARATOR> { <SEPARATOR> } <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' { <SEPARATOR> } <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' <SEPARATOR> { <SEPARATOR> } <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' 'x' { <SEPARATOR> } <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' 'x' <SEPARATOR> { <SEPARATOR> } <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' 'x' 'x' { <SEPARATOR> } <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' 'x' 'x' <INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' 'x' 'x' <NEGATIVE_INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' 'x' 'x' '-' <POSITIVE_INTEGER> { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' 'x' 'x' '-' <DIGIT> { <DIGIT> } { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' 'x' 'x' '-' '2' { <DIGIT> } { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' 'x' 'x' '-' '2' <DIGIT> { <DIGIT> } { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' 'x' 'x' '-' '2' '3' { <DIGIT> } { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' 'x' 'x' '-' '2' '3' { <SEPARATORS> <INTEGER> } <EOS>
+'/' '/' '[' 'x' 'x' 'x' ']' '[' 'y' 'y' 'y' ']' '\n' '1' '2' '3' 'x' 'x' 'x' '-' '2' '3' <EOS>

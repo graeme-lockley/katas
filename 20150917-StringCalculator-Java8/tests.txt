@@ -1,0 +1,32 @@
+
+"given an empty string" should "return 0"
+
+"given a number" should "return its value"
+	add("123") === 123
+
+"given numbers separated with a comma" should "return the sum"
+	add("-1,2,1003") === 1004
+
+"given numbers separated with a comma or newline" should "return the sum"
+	add("-1,2\n1003") === 1004
+
+"given numbers separated with a single character custom separator" should "return the sum"
+	add("//;\n-1;2;1003") === 1004
+
+"given numbers separated with a single regex character custom separator" should "return the sum"
+	add("//*\n-1*2*1003") === 1004
+
+"given numbers with at least one negative number" should "throw an exception"
+	add("-1,2,-3,4,-5")
+
+"given numbers with at least one negative number" should "throw an exception with the negative numbers in the exception message"
+	add("-1,2,-3,4,-5")
+
+"given a number greater than 1000" should "return 0"
+	add("12345")
+
+"given non-negative numbers separated with a single mult-character separator" should "return the sum"
+	add("//[***]\n1***2***1003") === 3
+
+"given non-negative numbers separated with multiple mult-character separator" should "return the sum"
+	add("//[***][---]\n1---2***1003") === 3
