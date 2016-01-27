@@ -76,14 +76,12 @@ public class SC {
             return result;
         } else if (nextChar() == '[') {
             Set<String> separators = new HashSet<>();
-            skipChar();
-            separators.add(parseSEPARATORS());
-            match(']');
-            while (nextChar() == '[') {
-                skipChar();
+
+            do {
+                match('[');
                 separators.add(parseSEPARATORS());
                 match(']');
-            }
+            } while (nextChar() == '[');
 
             match('\n');
             int result = parseINTEGER(negatives);
