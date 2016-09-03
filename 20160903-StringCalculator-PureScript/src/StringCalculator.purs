@@ -53,11 +53,13 @@ formatRegex rs =
 
 
 stringToInt :: String -> Int
-stringToInt s = fromMaybe 0 $ fromString s
+stringToInt s =
+    fromMaybe 0 $ fromString s
 
 
 startsWith :: String -> String -> Boolean
-startsWith sub s = take (length sub) s == sub
+startsWith sub s =
+    take (length sub) s == sub
 
 
 exists :: forall a. (a -> Boolean) -> Array a -> Boolean
