@@ -1,0 +1,21 @@
+{
+  "name": "20160903-StringCalculator-PureScript",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-console": "^1.0.0",
+    "purescript-assert": "^1.0.0",
+    "purescript-spec": "^0.8.0",
+    "purescript-node-process": "^2.0.0"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^1.0.0"
+  },
+  "resolutions": {
+    "purescript-node-process": "^1.0.0"
+  }
+}
