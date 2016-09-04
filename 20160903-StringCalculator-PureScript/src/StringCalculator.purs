@@ -9,7 +9,6 @@ import Data.Int (fromString)
 import Data.Maybe (fromMaybe, isJust)
 import Data.String (drop, indexOf, joinWith, length, split, take)
 import Data.String.Regex (noFlags, regex, split, Regex) as RE
-import Data.Tuple (Tuple(..), fst, snd)
 
 import Partial.Unsafe (unsafePartial)
 
@@ -27,23 +26,28 @@ add input =
 stringToNumbers :: String -> Array Int
 stringToNumbers s =
     map stringToInt tokens
-        where parsedInput = parseInput s
-              tokens = RE.split (formatRegex $ fst parsedInput) $ snd parsedInput
+        where input = parseInput s
+              tokens = RE.split (formatRegex input.separators) input.content
 
 
-parseInput :: String -> Tuple (Array String) String
+type Input = {
+  separators :: Array String
+, content :: String
+}
+
+
+parseInput :: String -> Input
 parseInput input =
     if (startsWith "//[" input) then
-      let index = fromMaybe 1 $ indexOf "\n" input
-          separators =  split "][" $ drop 3 $ take (index - 1) input
-          numbers = drop (index + 1) input in
-      Tuple separators numbers
+      let index = fromMaybe 1 $ indexOf "\n" input in
+      { separators: split "][" $ drop 3 $ take (index - 1) input
+      , content: drop (index + 1) input }
     else if (startsWith "//" input) then
-      let separator =  take 1 $ drop 2 input
-          numbers = drop 4 input in
-      Tuple [separator] numbers
+      { separators: [ take 1 $ drop 2 input]
+      , content: drop 4 input }
     else
-      Tuple [",", "\\n"] input
+      { separators: [",", "\\n"]
+      , content: input }
 
 
 formatRegex :: Array String -> RE.Regex
