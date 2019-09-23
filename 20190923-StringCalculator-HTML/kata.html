@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="4">
+
+    <title>String Calculator Kata</title>
+</head>
+<body>
+<div id="results"></div>
+
+<script>
+    const add = input => {
+        console.log(input);
+
+        const split = (text, separator) =>
+            text === "" ? [] : text.split(separator);
+
+        const escapeRE = text =>
+            text.replace(/[+*()\\.^$|?]/g, "\\$&");
+
+        const multiCharacterSeparator = () => {
+            const indexOfNewline =
+                input.indexOf("\n");
+
+            const separators =
+                new RegExp(
+                    input
+                        .slice(3, indexOfNewline - 1)
+                        .split("][")
+                        .sort((x, y) => y.length - x.length)
+                        .map(escapeRE)
+                        .join("|")
+                );
+
+            return split(input.slice(indexOfNewline + 1), separators);
+        };
+
+        const tokens =
+            input.startsWith("//[") ? multiCharacterSeparator()
+                : input.startsWith("//") ? split(input.slice(4), input[2])
+                : split(input, /[,\n]/);
+
+        const numbers =
+            tokens.map(t => parseInt(t));
+
+        if (numbers.some(n => n < 0))
+            throw numbers.filter(n => n < 0).join(", ");
+        else
+            return numbers.filter(n => n < 1001).reduce((x, y) => x + y, 0);
+    };
+
+
+    const integerInRange = (min, max) =>
+        Math.floor(Math.random() * (max - min + 1)) + min;
+
+    const listOf = gen =>
+        () => Array(integerInRange(0, 10)).fill(0).map(gen);
+
+    const nonEmptyListOf = gen =>
+        () => Array(integerInRange(1, 10)).fill(0).map(gen);
+
+    const map = (gen, f) =>
+        () => f(gen());
+
+    const filter = (gen, predicate) =>
+        () => {
+            const value =
+                gen();
+
+            return predicate(value)
+                ? value
+                : filter(gen, predicate)();
+        };
+
+    const forall = (gen, predicate) => {
+        for (let lp = 0; lp < 1000; lp += 1) {
+            const value =
+                gen();
+
+            if (!predicate(value))
+                return false;
+        }
+        return true;
+    };
+
+    const forall2 = (gen1, gen2, predicate) => {
+        for (let lp = 0; lp < 1000; lp += 1) {
+            const value1 =
+                gen1();
+
+            const value2 =
+                gen2();
+
+            if (!predicate(value1, value2))
+                return false;
+        }
+        return true;
+    };
+
+
+    const INTEGERS =
+        () => integerInRange(-2000, 2000);
+
+    const POSITIVE_INTEGERS =
+        () => integerInRange(0, 2000);
+
+    const SEPARATORS =
+        filter(map(() => integerInRange(32, 127), i => String.fromCharCode(i)), c => "0123456789-[".indexOf(c) === -1);
+
+    const STRING_SEPARATORS =
+        map(nonEmptyListOf(SEPARATORS), s => s.join(""));
+
+    const tests = [
+        {
+            name: "given positive integers separated with a comma or newline should return the sum of all number less than 1001",
+            assert: () => forall(listOf(POSITIVE_INTEGERS), ns =>
+                add(mkString(ns, [",", "\n"])) === filterSum(ns)
+            )
+        },
+        {
+            name: "given positive integers separated with a single character custom separator should return the sum of all number less than 1001",
+            assert: () => forall2(listOf(POSITIVE_INTEGERS), SEPARATORS, (ns, sep) =>
+                add(`//${sep}\n${ns.join(sep)}`) === filterSum(ns)
+            )
+        },
+        {
+            name: "given positive integers separated with multiple multi-character custom separator should return the sum of all number less than 1001",
+            assert: () => forall2(listOf(POSITIVE_INTEGERS), nonEmptyListOf(STRING_SEPARATORS), (ns, seps) =>
+                add(`//[${seps.join("][")}]\n${mkString(ns, seps)}`) === filterSum(ns)
+            )
+        },
+        {
+            name: "given integers with at least one negative should throw an exception with all of the negatives",
+            assert: () => forall(filter(listOf(INTEGERS), ns => ns.some(n => n < 0)), ns =>
+                catchException(() => add(ns.join(","))) === ns.filter(n => n < 0).join(", ")
+            )
+        }
+    ];
+
+    const filterSum = ns =>
+        ns.filter(n => n < 1001).reduce((x, y) => x + y, 0);
+
+    const mkString = (ns, seps) =>
+        ns.length === 0 ? ""
+            : ns.length === 1 ? ns[0].toString()
+            : ns[0].toString() + seps[integerInRange(0, seps.length - 1)] + mkString(ns.slice(1), seps);
+
+
+    const catchException = f => {
+        try {
+            f();
+            return undefined;
+        } catch (e) {
+            return e;
+        }
+    };
+
+    const renderTest = test => {
+        try {
+            const value =
+                test.assert();
+
+            return value
+                ? `<li style="color: green"> ${test.name}`
+                : `<li style="color: red"> ${test.name}`;
+        } catch (e) {
+            return `<li style="color: darkred"> ${test.name}: ${e}`;
+        }
+    };
+
+    document.getElementById("results").innerHTML =
+        "<ul>" +
+        tests.map(renderTest).join("") +
+        "</ul>";
+</script>
+</body>
+</html>
